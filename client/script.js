@@ -1,8 +1,10 @@
 var socket = io({ autoConnect: false });
 
-
+let currentQuestion;
+let playerId;
 
 socket.on('question', (question) => {
+  currentQuestion = question;
   console.log(question)
 })
 
@@ -11,10 +13,15 @@ socket.on('player joined', (payload) => {
 })
 
 socket.on('joined room', (payload) => {
-  console.log(payload);
+  playerId = payload.playerId;
+  console.log(payload.message)
 })
 
 socket.on('game over', (payload) => {
+  console.log(payload);
+})
+
+socket.on('user already exists', (payload) => {
   console.log(payload);
 })
 
@@ -28,7 +35,13 @@ document.getElementById('joinRoomBtn').addEventListener('click', () => {
 });
 
 document.getElementById('startGameBtn').addEventListener('click', () => {
-  socket.connect();
-
   socket.emit('start game');
+});
+
+document.getElementById('answerBtn').addEventListener('click', () => {
+  socket.emit('answer', {
+    questionId: currentQuestion.questionId,
+    answerId: 1,
+    playerId,
+  });
 });

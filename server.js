@@ -23,20 +23,13 @@ server.listen(port, () => {
 });
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
-
   socket.on('join room', (payload) => {
     if (payload.roomId === Brutus.roomId) {
       if (Brutus.userAlreadyExists(payload.name)) {
         socket.emit('user already exists', payload.name)
         return;
       }
-
-      socket.join(Brutus.roomId)
-
-      io.to(Brutus.roomId).emit('player joined', `${payload.name} joined the room`);
-      socket.emit('joined room', 'You have joined the room')
-      // io.to(brutusRoomId).emit('question', getQuestion(1))
+      Brutus.joinRoom(payload, io, socket)
     } else {
       console.log("Could not join room");
     }
@@ -51,5 +44,19 @@ io.on('connection', (socket) => {
       io.to(Brutus.roomId).emit('question', question);
     }
   });
+
+  socket.on('answer', (payload) => {
+    Brutus.setAnswer(payload)
+
+    if (Brutus.shouldGetNextQuestion()) {
+      const question = Brutus.getNextQuestion();
+
+      if (question === undefined) {
+        io.to(Brutus.roomId).emit('game over', Brutus.gameResult());
+      } else {
+        io.to(Brutus.roomId).emit('question', question);
+      }
+    }
+  })
 });
 

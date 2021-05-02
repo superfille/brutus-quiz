@@ -1,5 +1,5 @@
 
-exports.brutus = (io) => {
+exports.brutus = () => {
   const roomId = '123'
   const players = [
     // {
@@ -14,71 +14,71 @@ exports.brutus = (io) => {
     // }
   ];
 
-  let currentQuestion = 50;
+  let currentQuestionId = -1;
   const questions = [
     {
-      id: 0,
+      questionId: 0,
       type: 'radio',
       question: 'Answer is 3',
       options: [
         {
-          id: 1,
+          optionId: 1,
           value: '1',
         },
         {
-          id: 2,
+          optionId: 2,
           value: '2',
         },
         {
-          id: 3,
+          optionId: 3,
           value: '3',
         }
       ],
-      correctAnswer: 3, // optionId
+      correctAnswerId: 3, // optionId
     },
     {
-      id: 1,
+      questionId: 1,
       type: 'radio',
       question: 'This is the second question',
       options: [
         {
-          id: 1,
+          optionId: 1,
           value: '1',
         },
         {
-          id: 2,
+          optionId: 2,
           value: '2',
         },
         {
-          id: 3,
+          optionId: 3,
           value: '3',
         }
       ],
-      correctAnswer: 3, // optionId
+      correctAnswerId: 3, // optionId
     },
     {
-      id: 2,
+      questionId: 2,
       type: 'radio',
       question: 'This is the third question',
       options: [
         {
-          id: 1,
+          optionId: 1,
           value: '1',
         },
         {
-          id: 2,
+          optionId: 2,
           value: '2',
         },
         {
-          id: 3,
+          optionId: 3,
           value: '3',
         }
       ],
-      correctAnswer: 3, // optionId
+      correctAnswerId: 3, // optionId
     }
   ];
   
-  const joinRoom = (payload, socket) => {
+  const joinRoom = (payload, io, socket) => {
     if (payload.roomId === roomId) {
       if (userAlreadyExists(payload.name)) {
         socket.emit('joined room', {
@@ -89,8 +89,10 @@ exports.brutus = (io) => {
   
         socket.join(roomId)
         socket.emit('joined room', {
-          message: 'Successfully joined room'
+          message: 'Successfully joined room',
+          playerId,
         });
+        io.to(roomId).emit('player joined', `${payload.name} joined the room`);
       }
     } else {
       socket.emit('joined room', {
@@ -107,39 +109,63 @@ exports.brutus = (io) => {
     const playerId = name
       + Math.floor(Math.random() * 10000)
       + Math.floor(Math.random() * 10000)
-      + Math.floor(Math.random() * 10000)
   
-    brutusRoom.players.push({
+    players.push({
       name,
-      playerId: playerId
+      playerId,
+      answers: [],
     })
   
     return playerId;
   }
   
   const getNextQuestion = () => {
-    currentQuestion += 1;
-    if (currentQuestion >= questions.length) {
+    if (currentQuestionId >= questions.length) {
       console.log('No more questions')
       return undefined;
     }
-
-    return getQuestion(currentQuestion)
+    currentQuestionId += 1;
+    const q = getQuestion(currentQuestionId)
+    console.log(q, currentQuestionId);
+    return q;
   }
 
   const getQuestion = (questionId) => {
-    const question = questions.find(q => q.id === questionId)
+    const question = questions.find(q => q.questionId === questionId)
     if (question) {
       return {
         ...question,
-        correctAnswer: undefined
+        correctAnswerId: undefined
       }
     }
   }
 
+  const setAnswer = (payload) => {
+    const player = players.find(p => p.playerId === payload.playerId)
+    if (player === undefined) {
+      return undefined;
+    }
+
+    const answer = player.answers.find(a => a.questionId === payload.questionId)
+    if (answer) {
+      answer.answerId = payload.answerId
+    } else {
+      player.answers.push({
+        questionId: payload.questionId,
+        answerId: payload.answerId,
+      });
+      console.log(player.answers);
+    }
+  }
+
+  const shouldGetNextQuestion = () => {
+    const playersAnswered = players.filter(player => player.answers.some(answer => answer.questionId === currentQuestionId)).length;
+    return playersAnswered === players.length
+  }
+
   const gameResult = () => {
     return {
-      result: 'Filip wins'
+      players
     };
   }
 
@@ -151,5 +177,7 @@ exports.brutus = (io) => {
     getQuestion,
     getNextQuestion,
     gameResult,
+    setAnswer,
+    shouldGetNextQuestion,
   }
 }

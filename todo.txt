@@ -2,6 +2,9 @@ Todos:
 POC version of the quiz
 1. [J] Connect to server
 2. [J] Get question
-3. Answer question
-4. Get new question
-5. Get score when no more questions
+3. [J] Answer question
+4. [J] Get new question
+5. [J] Get score when no more questions
+6. Try with multiple players
+7. Get score formatted
+8. A way to restart questions
