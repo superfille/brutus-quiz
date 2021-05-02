@@ -52,7 +52,8 @@ io.on('connection', (socket) => {
       const question = Brutus.getNextQuestion();
 
       if (question === undefined) {
-        io.to(Brutus.roomId).emit('game over', Brutus.gameResult());
+        io.to(Brutus.roomId).emit('game over all results', Brutus.gameResult());
+        Brutus.sendResultsToIndividuals(io)
       } else {
         io.to(Brutus.roomId).emit('question', question);
       }

@@ -17,8 +17,12 @@ socket.on('joined room', (payload) => {
   console.log(payload.message)
 })
 
-socket.on('game over', (payload) => {
+socket.on('game over all results', (payload) => {
   console.log(payload);
+})
+
+socket.on('my results', (payload) => {
+  console.log('My results', payload)
 })
 
 socket.on('user already exists', (payload) => {
@@ -41,7 +45,7 @@ document.getElementById('startGameBtn').addEventListener('click', () => {
 document.getElementById('answerBtn').addEventListener('click', () => {
   socket.emit('answer', {
     questionId: currentQuestion.questionId,
-    answerId: 1,
+    answerId: Math.random() < 0.5 ? 3 : 1,
     playerId,
   });
 });

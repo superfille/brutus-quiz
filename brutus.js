@@ -9,74 +9,50 @@ exports.brutus = () => {
     //     {
     //       questionId: '1',
     //       answerId: '',
+    //       isCorrect: false
     //     }
     //   ]
     // }
   ];
 
-  let currentQuestionId = -1;
-  const questions = [
-    {
-      questionId: 0,
-      type: 'radio',
-      question: 'Answer is 3',
-      options: [
-        {
-          optionId: 1,
-          value: '1',
-        },
-        {
-          optionId: 2,
-          value: '2',
-        },
-        {
-          optionId: 3,
-          value: '3',
-        }
-      ],
-      correctAnswerId: 3, // optionId
-    },
-    {
-      questionId: 1,
-      type: 'radio',
-      question: 'This is the second question',
-      options: [
-        {
-          optionId: 1,
-          value: '1',
-        },
-        {
-          optionId: 2,
-          value: '2',
-        },
-        {
-          optionId: 3,
-          value: '3',
-        }
-      ],
-      correctAnswerId: 3, // optionId
-    },
-    {
-      questionId: 2,
-      type: 'radio',
-      question: 'This is the third question',
-      options: [
-        {
-          optionId: 1,
-          value: '1',
-        },
-        {
-          optionId: 2,
-          value: '2',
-        },
-        {
-          optionId: 3,
-          value: '3',
-        }
-      ],
-      correctAnswerId: 3, // optionId
+  const gameResult = () => {
+    return players
+      .sort((a, b) => countPoints(b) - countPoints(a))
+      .map(player => {
+        return {
+          name: player.name,
+          points: countPoints(player)
+        };
+      });
+  }
+
+  const sendResultsToIndividuals = (io) => {
+    players.forEach(({ playerId }) => {
+      io.to(playerId).emit('my results', personalResult(playerId))
+    })
+  }
+
+  const personalResult = (playerId) => {
+    const player = players.find(p => p.playerId === playerId)
+    if (player === undefined) {
+      return undefined
     }
-  ];
+
+    return player.answers.map(answer => {
+      return {
+        question: getQuestion(answer.questionId),
+        answerId: answer.answerId,
+        isCorrect: answer.isCorrect
+      };
+    })
+  }
+
+  const countPoints = (player) => {
+    return player.answers.filter(({ isCorrect }) => isCorrect).length
+  }
+
+  let currentQuestionId = -1;
+  const questions = require('./questions.json');
   
   const joinRoom = (payload, io, socket) => {
     if (payload.roomId === roomId) {
@@ -85,7 +61,7 @@ exports.brutus = () => {
           message: 'Name already exists'
         });
       } else {
-        const playerId = createUser(payload.name)
+        const playerId = createUser(payload.name, socket.id)
   
         socket.join(roomId)
         socket.emit('joined room', {
@@ -105,39 +81,42 @@ exports.brutus = () => {
     return players.some(player => player.name === name)
   }
   
-  const createUser = (name) => {
-    const playerId = name
-      + Math.floor(Math.random() * 10000)
-      + Math.floor(Math.random() * 10000)
+  const createUser = (name, socketId) => {
+    // const playerId = name
+    //   + Math.floor(Math.random() * 10000)
+    //   + Math.floor(Math.random() * 10000)
   
     players.push({
       name,
-      playerId,
+      playerId: socketId,
       answers: [],
     })
   
-    return playerId;
+    return socketId;
   }
   
   const getNextQuestion = () => {
     if (currentQuestionId >= questions.length) {
-      console.log('No more questions')
       return undefined;
     }
     currentQuestionId += 1;
-    const q = getQuestion(currentQuestionId)
-    console.log(q, currentQuestionId);
-    return q;
+    return getQuestion(currentQuestionId);
   }
 
-  const getQuestion = (questionId) => {
+  const getQuestion = (questionId, withCorrectOption = false) => {
     const question = questions.find(q => q.questionId === questionId)
     if (question) {
       return {
         ...question,
-        correctAnswerId: undefined
+        correctOptionId: withCorrectOption ? question.correctOptionId : undefined // Remove so sneaky fe:ers dont see it in network
       }
     }
+  }
+
+  const isAnswerCorrect = (answerId, questionId) => {
+    const question = questions.find(q => q.questionId === questionId);
+
+    return question && question.correctOptionId === answerId;
   }
 
   const setAnswer = (payload) => {
@@ -153,20 +132,14 @@ exports.brutus = () => {
       player.answers.push({
         questionId: payload.questionId,
         answerId: payload.answerId,
+        isCorrect: isAnswerCorrect(payload.answerId, payload.questionId)
       });
-      console.log(player.answers);
     }
   }
 
   const shouldGetNextQuestion = () => {
     const playersAnswered = players.filter(player => player.answers.some(answer => answer.questionId === currentQuestionId)).length;
     return playersAnswered === players.length
-  }
-
-  const gameResult = () => {
-    return {
-      players
-    };
   }
 
   return {
@@ -179,5 +152,7 @@ exports.brutus = () => {
     gameResult,
     setAnswer,
     shouldGetNextQuestion,
+    personalResult,
+    sendResultsToIndividuals,
   }
 }
