@@ -1,0 +1,7 @@
+Todos:
+POC version of the quiz
+1. [J] Connect to server
+2. [J] Get question
+3. Answer question
+4. Get new question
+5. Get score when no more questions
