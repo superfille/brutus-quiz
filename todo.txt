@@ -5,6 +5,24 @@ POC version of the quiz
 3. [J] Answer question
 4. [J] Get new question
 5. [J] Get score when no more questions
-6. Try with multiple players
-7. Get score formatted
+6. [J] Try with multiple players
+7. [J] Get score formatted
 8. A way to restart questions
+9. Support count downs
+10. Question timer
+
+
+Front-end
+0. Add vue
+1. Add intro page
+2. Add create user and enter room name
+3. Show waiting for other players
+4. Show game is about to start, count down
+5. Radio button question
+5.2. Radio with images
+5.3. Horizontal radio
+6. Multiple choice question
+7. Show who hasn't answered yet
+8. Show countdown of question timer
+9. Game over all players score
+10. Show players results
