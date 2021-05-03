@@ -13,7 +13,7 @@ POC version of the quiz
 
 
 Front-end
-0. Add vue
+0. [J] Add vue 03-05-2021
 1. Add intro page
 2. Add create user and enter room name
 3. Show waiting for other players
