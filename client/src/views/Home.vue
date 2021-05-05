@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <button @click="onClick">Click</button>
   </div>
 </template>
 
@@ -11,6 +12,8 @@ import { Component, Vue } from 'vue-property-decorator';
   },
 })
 export default class Home extends Vue {
-
+  private onClick() {
+    this.$router.push('/game')
+  }
 }
 </script>
