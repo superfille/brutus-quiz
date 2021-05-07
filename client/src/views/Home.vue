@@ -1,6 +1,36 @@
 <template>
-  <div class="home">
-    <button @click="onClick">Click</button>
+  <div>
+    <v-sheet :elevation="2" class="pa-6">
+      <v-container>
+        <h2>Welcome, please choose your username and room</h2>
+      </v-container>
+      <v-form v-model="valid">
+        <v-container class="pa-6">
+          <v-row>
+            <v-col cols="12" md="4">
+              <v-text-field
+                v-model="username"
+                label="Username"
+                required
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="12" md="4">
+              <v-text-field
+                v-model="roomId"
+                label="Roomid"
+                required
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="12" md="4">
+              <v-btn @click="joinRoom">Go</v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-form>
+
+    </v-sheet>
   </div>
 </template>
 
@@ -12,8 +42,13 @@ import { Component, Vue } from 'vue-property-decorator';
   },
 })
 export default class Home extends Vue {
-  private onClick() {
-    this.$router.push('/game')
+  private username = '';
+  private roomId = '';
+  private valid = false;
+
+  private joinRoom() {
+    // this.$router.push('/game')
+    console.log(this.username, this.roomId)
   }
 }
 </script>
