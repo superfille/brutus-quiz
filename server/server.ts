@@ -5,9 +5,16 @@ import Brutus from './brutus'
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:8080",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true
+  }
+});
 
-const port = 8080
+const port = 3000
 
 const brutus = new Brutus();
 
@@ -23,12 +30,15 @@ server.listen(port, () => {
   console.log('Listening to port', port);
 });
 
-app.get('/', (_, res) => {
-  res.send('Hello typescript')
-})
+// app.get('/', (_: any, res: any) => {
+//   res.send('Hello typescript')
+// })
 
 io.on('connection', (socket) => {
+  console.log('got a connection');
+  
   socket.on('join room', (payload) => {
+    console.log(payload)
     if (brutus.isRoomId(payload.roomId)) {
       if (brutus.userAlreadyExists(payload.name)) {
         socket.emit('user already exists', payload.name)

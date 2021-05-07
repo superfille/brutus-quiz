@@ -4,7 +4,7 @@
       <v-container>
         <h2>Welcome, please choose your username and room</h2>
       </v-container>
-      <v-form v-model="valid">
+      <v-form>
         <v-container class="pa-6">
           <v-row>
             <v-col cols="12" md="4">
@@ -44,11 +44,11 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class Home extends Vue {
   private username = '';
   private roomId = '';
-  private valid = false;
 
   private joinRoom() {
     // this.$router.push('/game')
     console.log(this.username, this.roomId)
+    this.$socket.emit('join room', { username: this.username, roomId: this.roomId })
   }
 }
 </script>
