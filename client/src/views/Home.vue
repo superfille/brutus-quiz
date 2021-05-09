@@ -48,7 +48,9 @@ export default class Home extends Vue {
   private joinRoom() {
     // this.$router.push('/game')
     console.log(this.username, this.roomId)
-    this.$socket.emit('join room', { username: this.username, roomId: this.roomId })
+    this.$socket.client.emit('join room', { username: this.username, roomId: this.roomId })
+
+    this.$socket.$subscribe('joined game')
   }
 }
 </script>

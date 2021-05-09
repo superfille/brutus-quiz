@@ -42,9 +42,11 @@ io.on('connection', (socket) => {
     if (brutus.isRoomId(payload.roomId)) {
       if (brutus.userAlreadyExists(payload.name)) {
         socket.emit('user already exists', payload.name)
+        console.log('user already exists')
         return;
       }
       brutus.joinRoom(payload, io, socket)
+      console.log('joined room')
     } else {
       console.log("Could not join room");
     }

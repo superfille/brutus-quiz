@@ -1,15 +1,15 @@
 import Vue from 'vue'
-import VueSocketIO from 'vue-socket.io';
+import VueSocketIOExt from 'vue-socket.io-extended';
 import App from '@/App.vue'
 import router from '@/router/index'
 import vuetify from '@/plugins/vuetify'
 import socketio from 'socket.io-client';
 
+const socket = socketio('http://localhost:3000');
+
+Vue.use(VueSocketIOExt, socket);
+
 Vue.config.productionTip = false
-Vue.use(new VueSocketIO({
-  debug: true,
-  connection: socketio('http://localhost:3000'),
-}))
 
 new Vue({
   sockets:{
