@@ -58,7 +58,7 @@ io.on('connection', (socket) => {
     if (question === undefined) {
       io.to(brutus.roomId).emit('game over', brutus.gameResults());
     } else {
-      io.to(brutus.roomId).emit('question', question);
+      io.to(brutus.roomId).emit('next question', question);
     }
   });
 
@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
         io.to(brutus.roomId).emit('game over all results', brutus.gameResults());
         brutus.sendResultsToIndividuals(io)
       } else {
-        io.to(brutus.roomId).emit('question', question);
+        io.to(brutus.roomId).emit('next question', question);
       }
     }
   })

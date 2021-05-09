@@ -1,0 +1,10 @@
+import { Socket } from "socket.io-client"
+
+export enum SocketActions {
+  JOINROOM = 'join room',
+}
+
+export enum SocketSubscriptions {
+  JOINEDROOM = 'joined room',
+  NEXTQUESTION = 'next question',
+}

@@ -42,6 +42,7 @@ export default class Brutus {
   }
 
   userAlreadyExists(name: string) {
+    console.log(this.players)
     return this.players.some(player => player.name === name);
   }
 

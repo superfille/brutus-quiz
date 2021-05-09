@@ -2,15 +2,15 @@
   <div>
     <v-sheet :elevation="2" class="pa-6">
       <v-container>
-        <h2>Welcome, please choose your username and room</h2>
+        <h2>Welcome, please choose your name and room</h2>
       </v-container>
       <v-form>
         <v-container class="pa-6">
           <v-row>
             <v-col cols="12" md="4">
               <v-text-field
-                v-model="username"
-                label="Username"
+                v-model="name"
+                label="Name"
                 required
               ></v-text-field>
             </v-col>
@@ -36,21 +36,32 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { joinRoomAction } from '@/services/socket-actions'
+import { joinedRoomSubscription, nextQuestion } from '@/services/socket-subscriptions'
+import { JoinedRoomInformation, Question } from '@/interfaces/interfaces';
 
 @Component({
   components: {
   },
 })
 export default class Home extends Vue {
-  private username = '';
+  private name = '';
   private roomId = '';
 
-  private joinRoom() {
-    // this.$router.push('/game')
-    console.log(this.username, this.roomId)
-    this.$socket.client.emit('join room', { username: this.username, roomId: this.roomId })
+  private created() {
+    joinedRoomSubscription(this.$socket.client, (info: JoinedRoomInformation): void => {
+      console.log('in here', info);
+      if (info.status === 200) {
+        nextQuestion(this.$socket.client, (q: Question) => {
+          console.log(q);
+        });
+        
+      }
+    })
+  }
 
-    this.$socket.$subscribe('joined game')
+  private joinRoom() {
+    joinRoomAction(this.$socket.client, { name: this.name, roomId: this.roomId });
   }
 }
 </script>
