@@ -8,7 +8,9 @@ export interface Answers {
 export interface Player {
   name: string;
   playerId: string;
+  roomId: string;
   answers: Array<Answers>;
+  isAdmin: boolean;
 }
 
 export interface ForAllGameResult {
@@ -45,6 +47,7 @@ export interface JoinedRoomInformation {
   message: string;
   roomId?: string;
   playerId?: string;
+  name: string;
 }
 
 export interface AnswerQuestion {

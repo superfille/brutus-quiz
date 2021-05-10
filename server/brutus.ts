@@ -101,7 +101,8 @@ export default class Brutus {
     if (payload.roomId === this.roomId) {
       if (this.userAlreadyExists(payload.name)) {
         socket.emit('joined room', {
-          message: 'Name already exists'
+          message: 'Name already exists',
+          status: 500
         });
       } else {
         const playerId = this.createUser(payload.name, socket.id)
@@ -110,12 +111,16 @@ export default class Brutus {
         socket.emit('joined room', {
           message: 'Successfully joined room',
           playerId,
+          roomId: this.roomId,
+          name: payload.name,
+          status: 200
         });
         io.to(this.roomId).emit('player joined', `${payload.name} joined the room`);
       }
     } else {
       socket.emit('joined room', {
-        message: 'Room does not exist'
+        message: 'Room does not exist',
+        status: 500
       });
     }
   }
